@@ -1,0 +1,9 @@
+package com.ddoongmause;
+
+import org.springframework.test.context.junit4.SpringRunner;
+
+@Runwith(SpringRunner.class)
+@SpringBootTest
+public class SampleControllerTests {
+
+}
