@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<h1 th:text='${now}'></h1>
+	<h2 th:text="${#dates.format(now, 'yyyy-MM-dd')}"></h2>
+		<div th:with='timeValue=${#dates.createToday()}'>
+			<p>[[${timeValue}]]</p>
+		</div>
+	<h1 th:text='${price}'></h1>
+	<h1 th:text='${title}'></h1>
+	<h1 th:text='${options}'></h1>
+</body>
+</html>
