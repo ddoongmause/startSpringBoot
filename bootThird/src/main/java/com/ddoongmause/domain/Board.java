@@ -23,7 +23,7 @@ import lombok.ToString;
 public class Board {
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long bno;
 	private String title;
 	private String writer;
