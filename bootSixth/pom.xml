@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.ddoongmause</groupId>
-	<artifactId>bootSeventh</artifactId>
+	<artifactId>bootSixth</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>war</packaging>
-	<name>bootSeventh</name>
+	<name>bootSixth</name>
 	<description>Demo project for Spring Boot</description>
 
 	<properties>
