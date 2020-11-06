@@ -6,10 +6,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.ddoongmause.domain.WebBoard;
 import com.ddoongmause.persistence.WebBoardRepository;
+import com.ddoongmause.vo.PageMaker;
 import com.ddoongmause.vo.PageVO;
 
 import lombok.extern.java.Log;
@@ -22,27 +26,36 @@ public class WebBoardController {
 	@Autowired
 	private WebBoardRepository repo;
 	
-	/*
-	@GetMapping("/list")
-	public void list(PageVO vo) {
-		
-		Pageable page = vo.makePageable(0, "bno");
-		
-		log.info("" + page);
-	}
-	*/
 	
 	@GetMapping("/list")
 	public void list(PageVO vo, Model model) {
 		
 		Pageable page = vo.makePageable(0, "bno");
 		
-		Page<WebBoard> result = repo.findAll(repo.makePredicate(null, null), page);
+		Page<WebBoard> result = repo.findAll(repo.makePredicate(vo.getType(), vo.getKeyword()), page);
 		
 		log.info("" + page);
 		log.info(""+result);
 		
-		model.addAttribute("result", result);
+		log.info("TOTAL PAGE NUMBER: " + result.getTotalPages());
+		
+		model.addAttribute("result", new PageMaker(result));
 	}
 	
+	@GetMapping("/register")
+	public void registerGET(@ModelAttribute("vo")WebBoard vo) {
+		log.info("register get");
+	}
+	
+	@PostMapping("/register")
+	public String registerPOST(@ModelAttribute("vo")WebBoard vo, RedirectAttributes rttr) {
+		
+		log.info("register post");
+		log.info("" + vo);
+		
+		repo.save(vo);
+		rttr.addFlashAttribute("msg", "success");
+		
+		return "redirect:/boards/list";
+	}
 }
