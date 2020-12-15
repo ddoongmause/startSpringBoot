@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.ddoongmause.domain.WebBoard;
-import com.ddoongmause.persistence.WebBoardRepository;
+import com.ddoongmause.persistence.CustomCrudRepository;
 import com.ddoongmause.vo.PageMaker;
 import com.ddoongmause.vo.PageVO;
 
@@ -24,22 +24,24 @@ import lombok.extern.java.Log;
 public class WebBoardController {
 	
 	@Autowired
-	private WebBoardRepository repo;
-	
+	//private WebBoardRepository repo;
+	private CustomCrudRepository repo;
 	
 	@GetMapping("/list")
-	public void list(PageVO vo, Model model) {
+	public void list(@ModelAttribute("pageVO") PageVO vo, Model model) {
 		
 		Pageable page = vo.makePageable(0, "bno");
 		
-		Page<WebBoard> result = repo.findAll(repo.makePredicate(vo.getType(), vo.getKeyword()), page);
+		//Page<WebBoard> result = repo.findAll(repo.makePredicate(vo.getType(), vo.getKeyword()), page);
+		
+		Page<Object[]> result = repo.getCustomPage(vo.getType(), vo.getKeyword(), page);
 		
 		log.info("" + page);
 		log.info(""+result);
 		
 		log.info("TOTAL PAGE NUMBER: " + result.getTotalPages());
 		
-		model.addAttribute("result", new PageMaker(result));
+		model.addAttribute("result", new PageMaker<>(result));
 	}
 	
 	@GetMapping("/register")
