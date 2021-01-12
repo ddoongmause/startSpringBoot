@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" 
+xmlns:sec='http://www.thymeleaf.org/thymeleaf-extras-springsecurity4'
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{/layout/layout1}">
 <head>
 
 <div layout:fragment="content">
+	<form th:action='${"/login"}'></form>
 	<div class="panel-heading">View Page</div>
 	<div class="panel-body">
 		<div class="form-group">
@@ -34,8 +36,9 @@
 		</div>
 	</div>
 	
-	<div class="pull-right">
-		<a th:href="@{modify(page=${pageVO.page}, size=${pageVO.size}, type=${pageVO.type}, keyword=${pageVO.keyword},bno=${vo.bno})}" class='btn btn-default'>Modify/Delete</a>
+	<div class="pull-right" th:with="uid=${#authentication.principal} eq 'anonymousUser'?'Guest':${#authentication.principal.member.uid}">
+		<!-- <a th:if='${uid} eq ${vo.writer}'th:href="@{modify(page=${pageVO.page}, size=${pageVO.size}, type=${pageVO.type}, keyword=${pageVO.keyword},bno=${vo.bno})}" class='btn btn-default'>Modify/Delete</a> -->
+		<a th:href="@{modify(page=${pageVO.page}, size=${pageVO.size}, type=${pageVO.type}, keyword=${pageVO.keyword},bno=${vo.bno})}" class='btn btn-default' id='goModBtn'>Modify/Delete</a>
 		<a th:href="@{ list(page=${pageVO.page}, size=${pageVO.size}, type=${pageVO.type}, keyword=${pageVO.keyword}, bno = ${vo.bno} )}" class="btn btn-primary">Go List</a>
 	</div>
 	<!-- end fragment -->
@@ -101,6 +104,8 @@
 			});*/
 			
 			$(document).ready(function(e){
+				var csrf = JSON.parse('[[${_csrf}]]');
+				
 				(function(){
 					replyManager.getAll([[${vo.bno}]], printList);
 				})();
@@ -150,7 +155,7 @@
 					var replyText = replyTextObj.val();
 					var replyer = replyerObj.val();
 					if(mode == 'ADD'){
-						var obj = {replyText:replyText, replyer: replyer, bno: bno};
+						var obj = {replyText:replyText, replyer: replyer, bno: bno, csrf: csrf};
 						//console.log(obj);
 						
 						replyManager.add(obj, function(list){
@@ -191,7 +196,42 @@
 				});
 				
 				
+				var uid = [[${#authentication.principal} eq 'anonymousUser'?null:${#authentication.principal.member.uid}]];
+				$('#goModBtn').click(function(e){
+					e.preventDefault();
+					
+					if(uid == null){
+						if(confirm('로그인할까요?')){
+							//self.location = [[@{/login}]];
+							self.location = $(this).attr('href');
+						}
+					}else{
+						if(uid == [[${vo.writer}]]){
+							self.location = $(this).attr('href');
+						}else{
+							alert('작성자만이 수정이나 삭제할 수 있습니다.')
+						}
+					}
+				});
 				
+				var uid = [[${#authentication.principal} eq 'anonymousUser' ? null : ${#authentication.principal.member.uid}]];
+				$('#addReplyBtn').click(function(){
+					
+					if(uid == null){
+						if(confirm('로그인할까요?')){
+							self.location = [[@{/login}]];
+						}
+						return;
+					}
+					replyerObj.val(uid);
+					
+					$('#myModal').modal('show');
+					$('.modal-title').text('Add Reply');
+					
+					$('#delModalBtn').hide();
+					
+					mode="ADD";
+				});
 			})
 			
 			
